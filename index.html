@@ -21,10 +21,21 @@
     <!-- I added preconnect for Google Fonts static domain for faster font loading -->
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- I imported the Inter font with multiple weights for typography hierarchy -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <!-- I created the body element that contains all visible content -->
 <body>
+    <!-- I created animated background particles for visual depth -->
+    <div class="bg-particles">
+        <!-- I added floating particle elements for atmospheric effect -->
+        <div class="particle particle-1"></div>
+        <div class="particle particle-2"></div>
+        <div class="particle particle-3"></div>
+        <div class="particle particle-4"></div>
+        <div class="particle particle-5"></div>
+        <div class="particle particle-6"></div>
+    </div>
+
     <!-- I created this main container to center and constrain the app layout -->
     <div class="container">
 
@@ -35,9 +46,15 @@
                 <!-- I added this logo section with an emoji and app name -->
                 <div class="logo">
                     <!-- I used a weather emoji as the app icon for visual appeal -->
-                    <span class="logo-icon">⛅</span>
-                    <!-- I added the app title text -->
-                    <h1>Weather App</h1>
+                    <div class="logo-icon-wrapper">
+                        <span class="logo-icon">⛅</span>
+                    </div>
+                    <!-- I added the app title and subtitle -->
+                    <div class="logo-text">
+                        <h1>Weather App</h1>
+                        <!-- I added a subtitle for context -->
+                        <span class="logo-subtitle">Real-time forecast</span>
+                    </div>
                 </div>
                 <!-- I created this theme toggle container for dark/light mode switching -->
                 <div class="theme-toggle-wrapper">
@@ -66,28 +83,42 @@
 
         <!-- I created this search section for city search functionality -->
         <section class="search-section">
-            <!-- I created a wrapper div to style the search input and button together -->
-            <div class="search-wrapper">
-                <!-- I created the city input field where users type the city name -->
-                <input 
-                    type="text" 
-                    id="cityInput" 
-                    class="search-input" 
-                    placeholder="🔍 Search city name..." 
-                    autocomplete="off"
-                    aria-label="Enter city name to search weather"
-                >
-                <!-- I created the search button that triggers weather data fetching -->
-                <button id="searchBtn" class="search-btn" aria-label="Search weather">
-                    <!-- I used a magnifying glass emoji as the button icon -->
-                    🔍
-                </button>
+            <!-- I created a relative container for search and suggestions -->
+            <div class="search-container">
+                <!-- I created a wrapper div to style the search input and button together -->
+                <div class="search-wrapper">
+                    <!-- I added a search icon inside the input area -->
+                    <span class="search-icon-left">🔍</span>
+                    <!-- I created the city input field where users type the city name -->
+                    <input 
+                        type="text" 
+                        id="cityInput" 
+                        class="search-input" 
+                        placeholder="Search any city..." 
+                        autocomplete="off"
+                        aria-label="Enter city name to search weather"
+                    >
+                    <!-- I created the search button that triggers weather data fetching -->
+                    <button id="searchBtn" class="search-btn" aria-label="Search weather">
+                        <!-- I used an arrow icon for the search button -->
+                        →
+                    </button>
+                </div>
+                <!-- I created this container for autocomplete suggestions -->
+                <ul class="suggestions-list" id="suggestionsList"></ul>
             </div>
-            <!-- I created a geolocation button so users can get weather for their current location -->
-            <button id="geoBtn" class="geo-btn" aria-label="Use my current location">
-                <!-- I used a pin emoji and text to indicate location detection -->
-                📍 Use My Location
-            </button>
+            <!-- I created a row for the geo button and quick cities -->
+            <div class="quick-actions">
+                <!-- I created a geolocation button so users can get weather for their current location -->
+                <button id="geoBtn" class="geo-btn" aria-label="Use my current location">
+                    <!-- I used a pin emoji and text to indicate location detection -->
+                    📍 My Location
+                </button>
+                <!-- I added quick city buttons for popular cities -->
+                <button class="quick-city-btn" data-city="London">London</button>
+                <button class="quick-city-btn" data-city="New York">New York</button>
+                <button class="quick-city-btn" data-city="Dubai">Dubai</button>
+            </div>
         </section>
 
         <!-- I created this loading indicator that shows while fetching weather data -->
@@ -104,10 +135,15 @@
             <span class="error-icon">⚠️</span>
             <!-- I created a paragraph to display the error message dynamically -->
             <p class="error-message" id="errorMessage">City not found. Please try again.</p>
+            <!-- I added a retry button for better UX -->
+            <button class="retry-btn" id="retryBtn">Try Again</button>
         </div>
 
         <!-- I created this main weather card to display all weather information -->
         <section class="weather-card" id="weatherCard">
+            <!-- I created a decorative gradient bar at the top of the card -->
+            <div class="card-accent"></div>
+            
             <!-- I created a header area inside the card for the city name and country -->
             <div class="weather-card-header">
                 <!-- I created this div to hold the city name and country code -->
@@ -150,7 +186,9 @@
                 <!-- I created a detail item for the "Feels Like" temperature -->
                 <div class="detail-item">
                     <!-- I added an emoji icon for the feels like detail -->
-                    <span class="detail-icon">🌡️</span>
+                    <div class="detail-icon-circle feels">
+                        <span class="detail-icon">🌡️</span>
+                    </div>
                     <!-- I added a label for this detail -->
                     <span class="detail-label">Feels Like</span>
                     <!-- I created a span to show the feels like temperature value -->
@@ -159,7 +197,9 @@
                 <!-- I created a detail item for humidity percentage -->
                 <div class="detail-item">
                     <!-- I added a droplet emoji icon for humidity -->
-                    <span class="detail-icon">💧</span>
+                    <div class="detail-icon-circle humidity">
+                        <span class="detail-icon">💧</span>
+                    </div>
                     <!-- I added a label for humidity -->
                     <span class="detail-label">Humidity</span>
                     <!-- I created a span to show the humidity percentage value -->
@@ -168,7 +208,9 @@
                 <!-- I created a detail item for wind speed -->
                 <div class="detail-item">
                     <!-- I added a wind emoji icon -->
-                    <span class="detail-icon">💨</span>
+                    <div class="detail-icon-circle wind">
+                        <span class="detail-icon">💨</span>
+                    </div>
                     <!-- I added a label for wind speed -->
                     <span class="detail-label">Wind Speed</span>
                     <!-- I created a span to show the wind speed value -->
@@ -177,7 +219,9 @@
                 <!-- I created a detail item for atmospheric pressure -->
                 <div class="detail-item">
                     <!-- I added a gauge/barometer emoji icon for pressure -->
-                    <span class="detail-icon">🔵</span>
+                    <div class="detail-icon-circle pressure">
+                        <span class="detail-icon">🔵</span>
+                    </div>
                     <!-- I added a label for pressure -->
                     <span class="detail-label">Pressure</span>
                     <!-- I created a span to show the pressure value in hPa -->
@@ -186,16 +230,20 @@
                 <!-- I created a detail item for visibility -->
                 <div class="detail-item">
                     <!-- I added an eye emoji icon for visibility -->
-                    <span class="detail-icon">👁️</span>
+                    <div class="detail-icon-circle visibility">
+                        <span class="detail-icon">👁️</span>
+                    </div>
                     <!-- I added a label for visibility -->
                     <span class="detail-label">Visibility</span>
                     <!-- I created a span to show the visibility value in km -->
                     <span class="detail-value" id="visibility">10 km</span>
                 </div>
-                <!-- I created a detail item for sunrise/sunset times -->
+                <!-- I created a detail item for sunrise time -->
                 <div class="detail-item">
                     <!-- I added a sunrise emoji icon -->
-                    <span class="detail-icon">🌅</span>
+                    <div class="detail-icon-circle sunrise">
+                        <span class="detail-icon">🌅</span>
+                    </div>
                     <!-- I added a label for sunrise -->
                     <span class="detail-label">Sunrise</span>
                     <!-- I created a span to show the sunrise time -->
@@ -207,7 +255,7 @@
         <!-- I created a footer section with project attribution -->
         <footer class="app-footer">
             <!-- I added the internship project credit text -->
-            <p>Built with ❤️ for <strong>SYNTECXHUB</strong> Web Development Internship</p>
+            <p>Built with ❤️ for <strong>SYNTECXHUB <i>BY Kabeer</i></strong></p>
             <!-- I added the task and project identification -->
             <p class="footer-sub">Task 4 — Project 1 | Weather App</p>
         </footer>
