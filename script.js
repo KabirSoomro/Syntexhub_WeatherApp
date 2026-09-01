@@ -8,12 +8,10 @@
 
 // I created this config object to store API key and base URL for easy access
 const config = {
-    // I set the API key as a placeholder — user will replace with their own key from https://openweathermap.org/api
+    // I set the API key — user needs to replace with their own key from https://openweathermap.org/api
     apiKey: '9928232d89f5fdb18c21e39f3cfeee98',
     // I set the base URL for the OpenWeatherMap current weather API
     baseUrl: 'https://api.openweathermap.org/data/2.5/weather',
-    // I set the forecast URL for 5-day weather forecast data
-    forecastUrl: 'https://api.openweathermap.org/data/2.5/forecast',
     // I set units to metric so temperature is returned in Celsius
     units: 'metric',
     // I set the language to English for weather descriptions
@@ -26,6 +24,8 @@ const config = {
 const themeToggle = document.getElementById('themeToggle');
 // I selected the city search input field so I can read the user's input
 const cityInput = document.getElementById('cityInput');
+// I selected the suggestions list container
+const suggestionsList = document.getElementById('suggestionsList');
 // I selected the search button so I can add a click event listener
 const searchBtn = document.getElementById('searchBtn');
 // I selected the geolocation button so users can get weather by location
@@ -44,6 +44,8 @@ const greetingEl = document.getElementById('greeting');
 const datetimeEl = document.getElementById('datetime');
 // I selected the unit toggle button so users can switch between °C and °F
 const unitToggle = document.getElementById('unitToggle');
+// I selected the retry button in the error container
+const retryBtn = document.getElementById('retryBtn');
 
 // ===== WEATHER DISPLAY ELEMENTS ===== //
 
@@ -73,6 +75,8 @@ const pressureEl = document.getElementById('pressure');
 const visibilityEl = document.getElementById('visibility');
 // I selected the sunrise span to display the sunrise time
 const sunriseEl = document.getElementById('sunrise');
+// I selected all quick city buttons for click events
+const quickCityBtns = document.querySelectorAll('.quick-city-btn');
 
 // ===== STATE VARIABLES ===== //
 
@@ -80,12 +84,29 @@ const sunriseEl = document.getElementById('sunrise');
 let isCelsius = true;
 // I created a variable to store the raw weather data for unit conversion
 let currentWeatherData = null;
+// I created a variable to store the last searched city for retry functionality
+let lastSearchedCity = 'Karachi';
+// I created a flag to track if we've successfully loaded data at least once
+let hasLoadedData = false;
+
+// ===== DEMO DATA ===== //
+
+// I created demo data so the app never looks empty, even before API key activates
+const demoData = {
+    name: 'Karachi',
+    sys: { country: 'PK', sunrise: 1693450200 },
+    weather: [{ description: 'clear sky', icon: '01d', id: 800 }],
+    main: { temp: 33, feels_like: 36, humidity: 62, pressure: 1008 },
+    wind: { speed: 4.5 },
+    visibility: 8000,
+    timezone: 18000
+};
 
 // ===== LOCALSTORAGE MANAGEMENT ===== //
 
 // I created this function to save data to localStorage with JSON serialization
 function saveToLocalStorage(key, value) {
-    // I used try-catch to handle potential localStorage errors (e.g., private browsing)
+    // I used try-catch to handle potential localStorage errors
     try {
         // I serialized the value to JSON and stored it with the given key
         localStorage.setItem(key, JSON.stringify(value));
@@ -119,7 +140,7 @@ function initTheme() {
     const savedTheme = getFromLocalStorage('weatherAppTheme');
     // I checked if a saved theme exists
     if (savedTheme === 'dark') {
-        // I applied the dark theme to the document body
+        // I applied the dark theme to the document element
         document.documentElement.setAttribute('data-theme', 'dark');
         // I set the toggle checkbox to checked state for dark mode
         themeToggle.checked = true;
@@ -208,8 +229,10 @@ function showLoading() {
     loadingContainer.classList.add('visible');
     // I removed the 'visible' class from the error container to hide any errors
     errorContainer.classList.remove('visible');
-    // I removed the 'visible' class from the weather card to hide old data
-    weatherCard.classList.remove('visible');
+    // I hid the weather card only if we haven't loaded data yet
+    if (!hasLoadedData) {
+        weatherCard.style.display = 'none';
+    }
 }
 
 // I created this function to hide the loading spinner
@@ -222,12 +245,15 @@ function hideLoading() {
 function showError(message) {
     // I hid the loading spinner first
     hideLoading();
-    // I hid the weather card when showing an error
-    weatherCard.classList.remove('visible');
     // I updated the error message text with the provided message
     errorMessage.textContent = message;
     // I showed the error container by adding the 'visible' class
     errorContainer.classList.add('visible');
+    // I kept the weather card visible if we have data (shows last known data)
+    if (!hasLoadedData) {
+        // I show the card with demo data if no real data has loaded
+        displayWeather(demoData, true);
+    }
 }
 
 // I created this function to hide the error message
@@ -242,31 +268,31 @@ function hideError() {
 function getWeatherEmoji(weatherId) {
     // I checked the weather condition ID from OpenWeatherMap to map appropriate emojis
     if (weatherId >= 200 && weatherId < 300) {
-        // I returned a thunderstorm emoji for thunderstorm conditions (200-299)
+        // I returned a thunderstorm emoji for thunderstorm conditions
         return '⛈️';
     } else if (weatherId >= 300 && weatherId < 400) {
-        // I returned a drizzle emoji for drizzle conditions (300-399)
+        // I returned a drizzle emoji for drizzle conditions
         return '🌦️';
     } else if (weatherId >= 500 && weatherId < 600) {
-        // I returned a rain emoji for rain conditions (500-599)
+        // I returned a rain emoji for rain conditions
         return '🌧️';
     } else if (weatherId >= 600 && weatherId < 700) {
-        // I returned a snow emoji for snow conditions (600-699)
+        // I returned a snow emoji for snow conditions
         return '❄️';
     } else if (weatherId >= 700 && weatherId < 800) {
-        // I returned a fog emoji for atmospheric conditions like mist/fog (700-799)
+        // I returned a fog emoji for atmospheric conditions
         return '🌫️';
     } else if (weatherId === 800) {
-        // I returned a sun emoji for clear sky conditions (800)
+        // I returned a sun emoji for clear sky
         return '☀️';
     } else if (weatherId === 801) {
-        // I returned a partly cloudy emoji for few clouds (801)
+        // I returned a partly cloudy emoji
         return '⛅';
     } else if (weatherId >= 802 && weatherId <= 804) {
-        // I returned a cloudy emoji for overcast/cloudy conditions (802-804)
+        // I returned a cloudy emoji for overcast
         return '☁️';
     } else {
-        // I returned a default weather emoji for unrecognized conditions
+        // I returned a default weather emoji
         return '🌤️';
     }
 }
@@ -275,13 +301,13 @@ function getWeatherEmoji(weatherId) {
 
 // I created this function to convert Unix timestamp to a readable time string
 function convertUnixToTime(unixTimestamp, timezoneOffset) {
-    // I created a new Date object from the Unix timestamp (in milliseconds)
+    // I created a new Date object from the Unix timestamp
     const date = new Date((unixTimestamp + timezoneOffset) * 1000);
-    // I extracted the hours in UTC (since we already applied the offset)
+    // I extracted the hours in UTC
     const hours = date.getUTCHours();
     // I extracted the minutes
     const minutes = date.getUTCMinutes();
-    // I determined if it's AM or PM
+    // I determined AM or PM
     const ampm = hours >= 12 ? 'PM' : 'AM';
     // I converted to 12-hour format
     const formattedHours = hours % 12 || 12;
@@ -311,6 +337,8 @@ async function fetchWeather(city) {
         return;
     }
 
+    // I saved the city name for retry functionality
+    lastSearchedCity = city;
     // I showed the loading spinner while data is being fetched
     showLoading();
     // I hid any previous error messages
@@ -331,9 +359,9 @@ async function fetchWeather(city) {
                 showError('🏙️ City not found. Please check the spelling and try again.');
             } else if (response.status === 401) {
                 // I showed an API key error message for 401 unauthorized
-                showError('🔑 Invalid API key. Please check your OpenWeatherMap API key.');
+                showError('🔑 API key is still activating. New keys take 2-3 hours to activate. Please wait and try again!');
             } else if (response.status === 429) {
-                // I showed a rate limit error message for 429 too many requests
+                // I showed a rate limit error message
                 showError('⏳ Too many requests. Please wait a moment and try again.');
             } else {
                 // I showed a generic error message for other HTTP errors
@@ -347,8 +375,10 @@ async function fetchWeather(city) {
         const data = await response.json();
         // I stored the raw data in the global variable for unit conversion
         currentWeatherData = data;
+        // I set the flag that we have successfully loaded data
+        hasLoadedData = true;
         // I called the display function to update the UI with the weather data
-        displayWeather(data);
+        displayWeather(data, false);
         // I saved the searched city to localStorage as the last searched city
         saveToLocalStorage('lastSearchedCity', city);
     } catch (error) {
@@ -361,84 +391,84 @@ async function fetchWeather(city) {
 
 // I created this async function to fetch weather by geographic coordinates
 async function fetchWeatherByCoords(lat, lon) {
-    // I checked if the API key has been set by the user
+    // I checked if the API key has been set
     if (config.apiKey === 'YOUR_API_KEY') {
-        // I showed an error message prompting the user to add their API key
         showError('⚠️ Please add your OpenWeatherMap API key in script.js');
-        // I returned early to prevent the API call
         return;
     }
 
-    // I showed the loading spinner while data is being fetched
+    // I showed the loading spinner
     showLoading();
     // I hid any previous error messages
     hideError();
 
-    // I used try-catch to handle any errors during the API call
+    // I used try-catch to handle errors
     try {
-        // I constructed the API URL using latitude and longitude instead of city name
+        // I constructed the API URL using latitude and longitude
         const url = `${config.baseUrl}?lat=${lat}&lon=${lon}&appid=${config.apiKey}&units=${config.units}&lang=${config.lang}`;
-        // I used the fetch API with await to make the HTTP GET request
+        // I made the HTTP GET request
         const response = await fetch(url);
 
         // I checked if the response was not successful
         if (!response.ok) {
-            // I showed a generic error message
-            showError(`❌ Error: Unable to fetch weather data (${response.status})`);
-            // I returned early to stop further processing
+            if (response.status === 401) {
+                showError('🔑 API key is still activating. New keys take 2-3 hours to activate. Please wait and try again!');
+            } else {
+                showError(`❌ Error: Unable to fetch weather data (${response.status})`);
+            }
             return;
         }
 
-        // I parsed the JSON response from the API
+        // I parsed the JSON response
         const data = await response.json();
-        // I stored the raw data in the global variable for unit conversion
+        // I stored the raw data
         currentWeatherData = data;
-        // I called the display function to update the UI with the weather data
-        displayWeather(data);
-        // I saved the city name from the API response as the last searched city
+        // I set the loaded flag
+        hasLoadedData = true;
+        // I updated the UI
+        displayWeather(data, false);
+        // I updated the input field with the detected city name
+        cityInput.value = data.name;
+        // I saved the city name
         saveToLocalStorage('lastSearchedCity', data.name);
     } catch (error) {
-        // I logged the error for debugging purposes
         console.error('I encountered an error fetching weather by coordinates:', error);
-        // I showed a network error message to the user
         showError('🌐 Network error. Please check your internet connection.');
     }
 }
 
 // ===== WEATHER DATA DISPLAY ===== //
 
-// I created this function to update the UI with weather data from the API response
-function displayWeather(data) {
+// I created this function to update the UI with weather data
+function displayWeather(data, isDemo) {
     // I hid the loading spinner since data has been received
     hideLoading();
-    // I hid any error messages
-    hideError();
 
     // I extracted the city name from the API response
     const cityName = data.name;
-    // I extracted the country code from the sys object
+    // I extracted the country code
     const country = data.sys.country;
-    // I extracted the weather description and capitalized it
+    // I extracted the weather description
     const description = data.weather[0].description;
     // I extracted the weather condition ID for emoji mapping
     const weatherId = data.weather[0].id;
-    // I extracted the weather icon code from the API response
+    // I extracted the weather icon code
     const iconCode = data.weather[0].icon;
-    // I extracted the current temperature and rounded it
+    // I extracted and rounded the current temperature
     const temp = Math.round(data.main.temp);
-    // I extracted the feels-like temperature and rounded it
+    // I extracted and rounded the feels-like temperature
     const feelsLike = Math.round(data.main.feels_like);
     // I extracted the humidity percentage
     const humidity = data.main.humidity;
-    // I extracted the wind speed and converted from m/s to km/h
+    // I extracted and converted wind speed from m/s to km/h
     const windSpeed = Math.round(data.wind.speed * 3.6);
     // I extracted the atmospheric pressure
     const pressure = data.main.pressure;
-    // I extracted the visibility and converted from meters to km
+    // I extracted and converted visibility to km
     const visibilityKm = (data.visibility / 1000).toFixed(1);
-    // I extracted the sunrise Unix timestamp
+    // I extracted the sunrise timestamp
     const sunrise = data.sys.sunrise;
-    // I extracted the timezone offset for proper time conversion
+    // I extracted the timezone offset
     const timezone = data.timezone;
 
     // I updated the city name in the UI
@@ -448,60 +478,60 @@ function displayWeather(data) {
     // I updated the weather description text
     weatherDescriptionEl.textContent = description;
 
-    // I constructed the OpenWeatherMap icon URL
-    const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
-    // I set the weather icon image source
-    weatherIconEl.src = iconUrl;
-    // I set the alt text for accessibility
-    weatherIconEl.alt = description;
-    // I showed the icon image
-    weatherIconEl.style.display = 'block';
-    // I hid the emoji fallback since we have an icon
-    weatherEmojiEl.style.display = 'none';
+    // I set the weather emoji based on condition
+    const emoji = getWeatherEmoji(weatherId);
+    weatherEmojiEl.textContent = emoji;
 
-    // I added an error handler in case the icon fails to load
-    weatherIconEl.onerror = () => {
-        // I hid the broken icon image
+    // I checked if this is demo data or real API data
+    if (!isDemo) {
+        // I constructed the OpenWeatherMap icon URL for real data
+        const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+        // I set the weather icon image source
+        weatherIconEl.src = iconUrl;
+        // I set the alt text for accessibility
+        weatherIconEl.alt = description;
+        // I showed the icon image
+        weatherIconEl.style.display = 'block';
+        // I hid the emoji since we have an icon
+        weatherEmojiEl.style.display = 'none';
+
+        // I added an error handler in case the icon fails to load
+        weatherIconEl.onerror = () => {
+            // I hid the broken icon image
+            weatherIconEl.style.display = 'none';
+            // I showed the emoji fallback
+            weatherEmojiEl.style.display = 'block';
+        };
+    } else {
+        // I showed the emoji for demo data since we don't have a real icon URL
         weatherIconEl.style.display = 'none';
-        // I showed the emoji fallback instead
         weatherEmojiEl.style.display = 'block';
-        // I set the emoji based on the weather condition
-        weatherEmojiEl.textContent = getWeatherEmoji(weatherId);
-    };
+    }
 
     // I checked if the user is viewing in Celsius or Fahrenheit
     if (isCelsius) {
         // I displayed the temperature in Celsius
         temperatureEl.textContent = temp;
-        // I set the unit label to °C
         tempUnitEl.textContent = '°C';
-        // I displayed the feels-like temperature in Celsius
         feelsLikeEl.textContent = `${feelsLike}°C`;
-        // I updated the unit toggle button text
         unitToggle.textContent = 'Switch to °F';
     } else {
         // I converted and displayed the temperature in Fahrenheit
         temperatureEl.textContent = celsiusToFahrenheit(temp);
-        // I set the unit label to °F
         tempUnitEl.textContent = '°F';
-        // I converted and displayed the feels-like temperature in Fahrenheit
         feelsLikeEl.textContent = `${celsiusToFahrenheit(feelsLike)}°F`;
-        // I updated the unit toggle button text
         unitToggle.textContent = 'Switch to °C';
     }
 
-    // I updated the humidity value
+    // I updated all the detail values
     humidityEl.textContent = `${humidity}%`;
-    // I updated the wind speed value in km/h
     windSpeedEl.textContent = `${windSpeed} km/h`;
-    // I updated the pressure value in hPa
     pressureEl.textContent = `${pressure} hPa`;
-    // I updated the visibility value in km
     visibilityEl.textContent = `${visibilityKm} km`;
-    // I converted and displayed the sunrise time using the timezone offset
     sunriseEl.textContent = convertUnixToTime(sunrise, timezone);
 
-    // I showed the weather card by adding the 'visible' class
+    // I showed the weather card
+    weatherCard.style.display = 'block';
     weatherCard.classList.add('visible');
 }
 
@@ -516,65 +546,51 @@ function toggleUnit() {
     // I checked if we have weather data to re-display
     if (currentWeatherData) {
         // I re-displayed the weather data with the new unit
-        displayWeather(currentWeatherData);
+        displayWeather(currentWeatherData, false);
+    } else {
+        // I re-displayed demo data with the new unit
+        displayWeather(demoData, true);
     }
 }
 
 // ===== GEOLOCATION SUPPORT ===== //
 
-// I created this function to get the user's current location using the browser's Geolocation API
+// I created this function to get the user's current location
 function getUserLocation() {
     // I checked if the browser supports the Geolocation API
     if (navigator.geolocation) {
-        // I showed a loading state while getting the user's location
+        // I showed a loading state
         showLoading();
-        // I called getCurrentPosition to get the user's coordinates
+        // I called getCurrentPosition to get coordinates
         navigator.geolocation.getCurrentPosition(
-            // I defined the success callback function
+            // I defined the success callback
             (position) => {
-                // I extracted the latitude from the position object
                 const lat = position.coords.latitude;
-                // I extracted the longitude from the position object
                 const lon = position.coords.longitude;
-                // I fetched the weather data using the coordinates
                 fetchWeatherByCoords(lat, lon);
             },
-            // I defined the error callback function
+            // I defined the error callback
             (error) => {
-                // I logged the geolocation error for debugging
                 console.error('I encountered a geolocation error:', error);
-                // I checked the error code to provide a specific message
                 switch (error.code) {
                     case error.PERMISSION_DENIED:
-                        // I showed an error message when the user denied location access
                         showError('📍 Location access denied. Please allow location access or search manually.');
                         break;
                     case error.POSITION_UNAVAILABLE:
-                        // I showed an error message when position is unavailable
                         showError('📍 Location unavailable. Please try searching manually.');
                         break;
                     case error.TIMEOUT:
-                        // I showed an error message when the request timed out
                         showError('📍 Location request timed out. Please try again.');
                         break;
                     default:
-                        // I showed a generic location error message
                         showError('📍 Unable to get your location. Please search manually.');
                         break;
                 }
             },
-            // I set options for the geolocation request
-            {
-                // I enabled high accuracy for better location results
-                enableHighAccuracy: true,
-                // I set a timeout of 10 seconds for the request
-                timeout: 10000,
-                // I set the maximum age of a cached position to 10 minutes
-                maximumAge: 600000
-            }
+            // I set geolocation options
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 600000 }
         );
     } else {
-        // I showed an error message if geolocation is not supported by the browser
         showError('📍 Geolocation is not supported by your browser.');
     }
 }
@@ -585,98 +601,211 @@ function getUserLocation() {
 function handleSearch() {
     // I got the city name from the input field and trimmed whitespace
     const city = cityInput.value.trim();
-    // I checked if the city name is not empty before fetching
+    // I checked if the city name is not empty
     if (city) {
-        // I called the fetchWeather function with the city name
         fetchWeather(city);
-        // I blurred the input field to hide the mobile keyboard
         cityInput.blur();
+        // I hid the suggestions list on search
+        suggestionsList.classList.remove('visible');
     } else {
-        // I showed an error if the input is empty
         showError('📝 Please enter a city name to search.');
     }
 }
 
+// ===== DEBOUNCE UTILITY ===== //
+
+// I created a debounce function to limit API calls while typing
+function debounce(func, delay) {
+    let timeoutId;
+    return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            func.apply(this, args);
+        }, delay);
+    };
+}
+
+// ===== AUTOCOMPLETE SUGGESTIONS ===== //
+
+// I created this async function to fetch city suggestions
+async function fetchSuggestions(query) {
+    // I checked if the query is empty
+    if (!query) {
+        // I hid the suggestions list if the input is empty
+        suggestionsList.classList.remove('visible');
+        return;
+    }
+
+    try {
+        // I used the OpenWeatherMap Geocoding API to get city suggestions
+        const url = `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${config.apiKey}`;
+        const response = await fetch(url);
+        
+        // I checked if the response is ok
+        if (!response.ok) return;
+
+        // I parsed the JSON response
+        const cities = await response.json();
+        
+        // I checked if there are any results
+        if (cities.length === 0) {
+            // I hid the suggestions list if no cities found
+            suggestionsList.classList.remove('visible');
+            return;
+        }
+
+        // I cleared the previous suggestions
+        suggestionsList.innerHTML = '';
+
+        // I looped through the returned cities to create suggestion items
+        cities.forEach(city => {
+            // I created a new list item element
+            const li = document.createElement('li');
+            li.classList.add('suggestion-item');
+            
+            // I constructed the display text (City, State if available)
+            const stateText = city.state ? `, ${city.state}` : '';
+            // I set the HTML content of the suggestion item
+            li.innerHTML = `
+                <div class="suggestion-info">
+                    <span>📍</span>
+                    <span>${city.name}${stateText}</span>
+                </div>
+                <span class="suggestion-country">${city.country}</span>
+            `;
+
+            // I added a click event to fetch weather for the selected city
+            li.addEventListener('click', () => {
+                // I updated the input field with the selected city name
+                cityInput.value = city.name;
+                // I hid the suggestions list
+                suggestionsList.classList.remove('visible');
+                // I fetched the weather for the selected city
+                fetchWeather(city.name);
+            });
+
+            // I appended the suggestion item to the list
+            suggestionsList.appendChild(li);
+        });
+
+        // I made the suggestions list visible
+        suggestionsList.classList.add('visible');
+    } catch (error) {
+        // I logged the error for debugging
+        console.error('I encountered an error fetching suggestions:', error);
+    }
+}
+
+// I wrapped the fetchSuggestions function with debounce (300ms delay)
+const debouncedFetchSuggestions = debounce((query) => {
+    fetchSuggestions(query);
+}, 300);
+
 // ===== EVENT LISTENERS ===== //
 
-// I added a change event listener to the theme toggle checkbox
+// I added a change event listener to the theme toggle
 themeToggle.addEventListener('change', () => {
-    // I called the toggleTheme function when the checkbox state changes
     toggleTheme();
 });
 
 // I added a click event listener to the search button
 searchBtn.addEventListener('click', () => {
-    // I called the handleSearch function when the search button is clicked
     handleSearch();
 });
 
-// I added a keydown event listener to the city input for Enter key support
+// I added a keydown event listener for Enter key support
 cityInput.addEventListener('keydown', (event) => {
-    // I checked if the pressed key is Enter
     if (event.key === 'Enter') {
-        // I prevented the default form submission behavior
         event.preventDefault();
-        // I called the handleSearch function when Enter is pressed
         handleSearch();
+    }
+});
+
+// I added an input event listener to the city input field for autocomplete
+cityInput.addEventListener('input', (event) => {
+    // I got the query and trimmed it
+    const query = event.target.value.trim();
+    // I called the debounced function
+    debouncedFetchSuggestions(query);
+});
+
+// I added a click event listener to the document to hide suggestions when clicking outside
+document.addEventListener('click', (event) => {
+    // I checked if the click was outside the input and suggestions list
+    if (suggestionsList && !cityInput.contains(event.target) && !suggestionsList.contains(event.target)) {
+        // I hid the suggestions list
+        suggestionsList.classList.remove('visible');
     }
 });
 
 // I added a click event listener to the geolocation button
 geoBtn.addEventListener('click', () => {
-    // I called the getUserLocation function when the geo button is clicked
     getUserLocation();
 });
 
 // I added a click event listener to the unit toggle button
 unitToggle.addEventListener('click', () => {
-    // I called the toggleUnit function when the button is clicked
     toggleUnit();
+});
+
+// I added a click event listener to the retry button
+retryBtn.addEventListener('click', () => {
+    hideError();
+    fetchWeather(lastSearchedCity);
+});
+
+// I added click event listeners to all quick city buttons
+quickCityBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+        // I got the city name from the button's data attribute
+        const city = btn.getAttribute('data-city');
+        // I updated the input field with the city name
+        cityInput.value = city;
+        // I fetched weather for the selected city
+        fetchWeather(city);
+    });
 });
 
 // ===== INITIALIZATION ===== //
 
 // I created this function to initialize the app when the page loads
 function initApp() {
-    // I called initTheme to load the saved theme preference
+    // I initialized the theme from localStorage
     initTheme();
-    // I called updateGreeting to show the time-based greeting
+    // I updated the greeting based on time of day
     updateGreeting();
-    // I called updateDateTime to display the current date and time
+    // I displayed the current date and time
     updateDateTime();
 
-    // I set up an interval to update the date and time every minute
+    // I set up an interval to update date/time every minute
     setInterval(() => {
-        // I called updateDateTime every 60 seconds to keep the time current
         updateDateTime();
-        // I also updated the greeting in case the time period changed
         updateGreeting();
     }, 60000);
 
-    // I loaded the saved unit preference from localStorage
+    // I loaded the saved unit preference
     const savedUnit = getFromLocalStorage('weatherAppUnit');
-    // I checked if a saved unit preference exists
     if (savedUnit === 'fahrenheit') {
-        // I set the unit to Fahrenheit if that was the saved preference
         isCelsius = false;
     }
 
+    // I showed demo data immediately so the app never looks empty
+    displayWeather(demoData, true);
+
     // I loaded the last searched city from localStorage
     const lastCity = getFromLocalStorage('lastSearchedCity');
-    // I checked if a last searched city exists
     if (lastCity) {
-        // I set the input field to the last searched city
         cityInput.value = lastCity;
-        // I fetched the weather for the last searched city
+        lastSearchedCity = lastCity;
+        // I attempted to fetch real data (will show demo if API fails)
         fetchWeather(lastCity);
     } else {
-        // I fetched weather for the default city (Karachi) on first load
+        // I attempted to fetch weather for the default city
         fetchWeather('Karachi');
     }
 }
 
 // I called the initApp function when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // I triggered the app initialization
     initApp();
 });
