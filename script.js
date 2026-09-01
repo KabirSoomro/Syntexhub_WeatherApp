@@ -638,7 +638,7 @@ async function fetchSuggestions(query) {
 
     try {
         // I used the OpenWeatherMap Geocoding API to get city suggestions
-        const url = `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${config.apiKey}`;
+        const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${config.apiKey}`;
         const response = await fetch(url);
         
         // I checked if the response is ok
