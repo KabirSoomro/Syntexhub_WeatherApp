@@ -1,0 +1,1331 @@
+/* ============================================= */
+/* I created this CSS file to style the entire Weather App */
+/* It includes light/dark theme support, responsive design, */
+/* animations, and professional aesthetics */
+/* ============================================= */
+
+/* ===== CSS CUSTOM PROPERTIES (THEMING) ===== */
+
+/* I defined CSS variables for the light theme as the default root theme */
+:root {
+    /* I set the primary background color to a soft gray-blue for light mode */
+    --bg-color: #F0F4F8;
+    /* I set the card background to white for contrast against the page background */
+    --card-bg: #FFFFFF;
+    /* I set the main text color to dark gray for readability */
+    --text-color: #2D3436;
+    /* I set the secondary text color for less prominent information */
+    --text-secondary: #636e72;
+    /* I set the primary brand color to purple for buttons and accents */
+    --primary-color: #6C63FF;
+    /* I set the primary hover state to a slightly darker purple */
+    --primary-hover: #5A52D5;
+    /* I set the secondary accent color to cyan for visual interest */
+    --secondary-color: #00D4FF;
+    /* I set the error/accent color to coral red for error messages */
+    --accent-color: #FF6B6B;
+    /* I set the card shadow for depth effect in light mode */
+    --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    /* I set a larger shadow for hover states */
+    --card-shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.12);
+    /* I set the input background color slightly darker than the page */
+    --input-bg: #E8EDF2;
+    /* I set the input border color for subtle definition */
+    --input-border: #D1D9E6;
+    /* I set the input focus border color to match the primary brand color */
+    --input-focus-border: #6C63FF;
+    /* I set the header background with slight transparency for a glassmorphism effect */
+    --header-bg: rgba(255, 255, 255, 0.8);
+    /* I set the border color for separators and outlines */
+    --border-color: #E2E8F0;
+    /* I set a subtle gradient for the page background */
+    --bg-gradient: linear-gradient(135deg, #F0F4F8 0%, #E2E8F0 50%, #F0F4F8 100%);
+    /* I set the toggle track background color for the theme switch */
+    --toggle-bg: #D1D9E6;
+    /* I set the detail item background for weather detail cards */
+    --detail-bg: #F7F9FC;
+    /* I set the detail item border */
+    --detail-border: #E8EDF2;
+    /* I set the footer text color */
+    --footer-color: #636e72;
+    /* I set the geo button background */
+    --geo-btn-bg: rgba(108, 99, 255, 0.08);
+    /* I set the geo button border */
+    --geo-btn-border: rgba(108, 99, 255, 0.2);
+}
+
+/* I defined CSS variables for the dark theme using the data-theme attribute */
+[data-theme="dark"] {
+    /* I set the dark background for dark mode */
+    --bg-color: #0D1117;
+    /* I set the dark card background for contrast */
+    --card-bg: #161B22;
+    /* I set the light text color for readability on dark backgrounds */
+    --text-color: #F0F6FC;
+    /* I set the secondary text color for dark mode */
+    --text-secondary: #8B949E;
+    /* I kept the primary color consistent across themes */
+    --primary-color: #6C63FF;
+    /* I kept the primary hover consistent */
+    --primary-hover: #7C75FF;
+    /* I kept the secondary color consistent */
+    --secondary-color: #00D4FF;
+    /* I kept the accent/error color consistent */
+    --accent-color: #FF6B6B;
+    /* I adjusted the card shadow for dark mode with a subtle glow */
+    --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    /* I adjusted the hover shadow for dark mode */
+    --card-shadow-hover: 0 20px 60px rgba(108, 99, 255, 0.1);
+    /* I set the input background darker for dark mode */
+    --input-bg: #21262D;
+    /* I set the input border darker */
+    --input-border: #30363D;
+    /* I set the input focus border to primary color */
+    --input-focus-border: #6C63FF;
+    /* I set the header background with dark transparency for glassmorphism */
+    --header-bg: rgba(22, 27, 34, 0.8);
+    /* I set the border color for dark mode */
+    --border-color: #21262D;
+    /* I set the dark gradient for the page background */
+    --bg-gradient: linear-gradient(135deg, #0D1117 0%, #161B22 50%, #0D1117 100%);
+    /* I set the toggle track background for dark mode */
+    --toggle-bg: #30363D;
+    /* I set the detail item background for dark mode */
+    --detail-bg: #0D1117;
+    /* I set the detail item border for dark mode */
+    --detail-border: #21262D;
+    /* I set the footer text color for dark mode */
+    --footer-color: #8B949E;
+    /* I set the geo button background for dark mode */
+    --geo-btn-bg: rgba(108, 99, 255, 0.12);
+    /* I set the geo button border for dark mode */
+    --geo-btn-border: rgba(108, 99, 255, 0.3);
+}
+
+/* ===== GLOBAL RESET ===== */
+
+/* I applied a universal reset to remove default browser margins and padding */
+* {
+    margin: 0;
+    padding: 0;
+    /* I set box-sizing to border-box so padding doesn't increase element size */
+    box-sizing: border-box;
+}
+
+/* I styled the body element with the background gradient and font family */
+body {
+    /* I set the font family to Inter from Google Fonts with fallbacks */
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* I applied the background gradient using CSS variable */
+    background: var(--bg-gradient);
+    /* I set the text color using CSS variable for theme support */
+    color: var(--text-color);
+    /* I set the minimum height to fill the full viewport */
+    min-height: 100vh;
+    /* I added a smooth transition for background and color changes during theme switch */
+    transition: background 0.4s ease, color 0.3s ease;
+    /* I added antialiased font rendering for smoother text */
+    -webkit-font-smoothing: antialiased;
+    /* I added Mozilla-specific font smoothing */
+    -moz-osx-font-smoothing: grayscale;
+    /* I set overflow-x to hidden to prevent horizontal scrollbar */
+    overflow-x: hidden;
+}
+
+/* ===== CONTAINER ===== */
+
+/* I styled the main container to center the app content */
+.container {
+    /* I set the maximum width to constrain the layout on large screens */
+    max-width: 620px;
+    /* I centered the container horizontally with auto margins */
+    margin: 0 auto;
+    /* I added padding for spacing from the viewport edges */
+    padding: 20px 24px 40px;
+    /* I set the minimum height to fill the viewport */
+    min-height: 100vh;
+    /* I used flexbox to vertically arrange child elements */
+    display: flex;
+    /* I set the flex direction to column for vertical stacking */
+    flex-direction: column;
+    /* I added a gap between flex children for consistent spacing */
+    gap: 20px;
+}
+
+/* ===== HEADER ===== */
+
+/* I styled the app header with glassmorphism effect */
+.app-header {
+    /* I applied the semi-transparent header background */
+    background: var(--header-bg);
+    /* I added a backdrop blur for the glassmorphism effect */
+    backdrop-filter: blur(20px);
+    /* I added the webkit version of backdrop blur for Safari support */
+    -webkit-backdrop-filter: blur(20px);
+    /* I added rounded corners for a modern look */
+    border-radius: 16px;
+    /* I added padding inside the header */
+    padding: 16px 24px;
+    /* I added a subtle border for definition */
+    border: 1px solid var(--border-color);
+    /* I added the card shadow for depth */
+    box-shadow: var(--card-shadow);
+    /* I added a smooth transition for all properties during theme change */
+    transition: all 0.3s ease;
+    /* I made the header sticky at the top of the page */
+    position: sticky;
+    /* I set the top position for sticky behavior */
+    top: 10px;
+    /* I set a high z-index so the header stays above other content */
+    z-index: 100;
+}
+
+/* I styled the header content wrapper for horizontal alignment */
+.header-content {
+    /* I used flexbox to align items horizontally */
+    display: flex;
+    /* I spaced items to opposite ends of the header */
+    justify-content: space-between;
+    /* I centered items vertically */
+    align-items: center;
+}
+
+/* I styled the logo section with flexbox alignment */
+.logo {
+    /* I used flexbox to align the icon and title horizontally */
+    display: flex;
+    /* I centered the logo items vertically */
+    align-items: center;
+    /* I added a gap between the icon and title text */
+    gap: 10px;
+}
+
+/* I styled the logo icon emoji for appropriate size */
+.logo-icon {
+    /* I set the emoji size large enough to be visible */
+    font-size: 1.8rem;
+    /* I added a subtle animation for visual polish */
+    animation: float 3s ease-in-out infinite;
+}
+
+/* I created a floating animation keyframe for the logo icon */
+@keyframes float {
+    /* I set the starting position of the float animation */
+    0% { transform: translateY(0px); }
+    /* I set the middle position slightly upward */
+    50% { transform: translateY(-5px); }
+    /* I set the ending position back to the start */
+    100% { transform: translateY(0px); }
+}
+
+/* I styled the h1 title in the header */
+.logo h1 {
+    /* I set the font size for the app title */
+    font-size: 1.3rem;
+    /* I set the font weight to semi-bold */
+    font-weight: 700;
+    /* I applied the text color variable */
+    color: var(--text-color);
+    /* I added a smooth transition for color changes */
+    transition: color 0.3s ease;
+    /* I removed the default margin */
+    margin: 0;
+}
+
+/* ===== THEME TOGGLE SWITCH ===== */
+
+/* I styled the theme toggle wrapper to align the switch and icons */
+.theme-toggle-wrapper {
+    /* I used flexbox for horizontal alignment */
+    display: flex;
+    /* I centered items vertically */
+    align-items: center;
+    /* I added a gap between the icons and the toggle */
+    gap: 8px;
+}
+
+/* I styled the theme icons (sun and moon emojis) */
+.theme-icon {
+    /* I set the icon size */
+    font-size: 1.1rem;
+    /* I added a transition for opacity changes */
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* I made the sun icon fully visible by default (light mode active) */
+.theme-icon.sun {
+    opacity: 1;
+}
+
+/* I made the moon icon semi-transparent by default (dark mode inactive) */
+.theme-icon.moon {
+    opacity: 0.4;
+}
+
+/* I adjusted icon visibility when dark theme is active */
+[data-theme="dark"] .theme-icon.sun {
+    /* I dimmed the sun icon in dark mode */
+    opacity: 0.4;
+}
+
+/* I made the moon icon fully visible in dark mode */
+[data-theme="dark"] .theme-icon.moon {
+    /* I brightened the moon icon in dark mode */
+    opacity: 1;
+}
+
+/* I styled the toggle label as a switch container */
+.theme-toggle {
+    /* I positioned it relative for the absolute-positioned slider */
+    position: relative;
+    /* I made it an inline-block for proper sizing */
+    display: inline-block;
+    /* I set the width of the toggle track */
+    width: 48px;
+    /* I set the height of the toggle track */
+    height: 26px;
+    /* I hid the default checkbox overflow */
+    overflow: hidden;
+    /* I added a cursor pointer to indicate clickability */
+    cursor: pointer;
+}
+
+/* I hid the default checkbox input visually */
+.theme-toggle input {
+    /* I set opacity to 0 to hide the checkbox but keep it accessible */
+    opacity: 0;
+    /* I set width and height to 0 */
+    width: 0;
+    height: 0;
+}
+
+/* I styled the toggle slider track */
+.slider {
+    /* I positioned the slider absolutely within the toggle label */
+    position: absolute;
+    /* I set all four edges to 0 to fill the parent */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* I applied the toggle background color */
+    background-color: var(--toggle-bg);
+    /* I added a smooth transition for the sliding animation */
+    transition: 0.3s ease;
+    /* I made the track fully rounded with border-radius */
+    border-radius: 26px;
+    /* I set the cursor to pointer */
+    cursor: pointer;
+}
+
+/* I created the toggle slider knob using a pseudo-element */
+.slider:before {
+    /* I set empty content for the pseudo-element */
+    content: "";
+    /* I positioned it absolutely within the slider */
+    position: absolute;
+    /* I set the size of the circular knob */
+    height: 20px;
+    width: 20px;
+    /* I positioned the knob at the left side initially */
+    left: 3px;
+    /* I centered the knob vertically */
+    bottom: 3px;
+    /* I set the knob color to white */
+    background-color: white;
+    /* I added a smooth transition for the sliding animation */
+    transition: 0.3s ease;
+    /* I made the knob circular */
+    border-radius: 50%;
+    /* I added a subtle shadow to the knob for depth */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* I moved the slider knob to the right when the checkbox is checked (dark mode) */
+.theme-toggle input:checked + .slider {
+    /* I changed the track color to primary when active */
+    background-color: var(--primary-color);
+}
+
+/* I translated the knob to the right position when checked */
+.theme-toggle input:checked + .slider:before {
+    /* I moved the knob 22px to the right */
+    transform: translateX(22px);
+}
+
+/* ===== GREETING SECTION ===== */
+
+/* I styled the greeting section for the time-based greeting */
+.greeting-section {
+    /* I centered the text */
+    text-align: center;
+    /* I added padding for spacing */
+    padding: 8px 0;
+}
+
+/* I styled the greeting text */
+.greeting {
+    /* I set the font size for the greeting */
+    font-size: 1.4rem;
+    /* I set the font weight to semi-bold */
+    font-weight: 600;
+    /* I applied the text color */
+    color: var(--text-color);
+    /* I added a margin below the greeting */
+    margin-bottom: 4px;
+    /* I added a transition for color changes */
+    transition: color 0.3s ease;
+}
+
+/* I styled the date and time display text */
+.datetime {
+    /* I set the font size smaller than the greeting */
+    font-size: 0.9rem;
+    /* I applied the secondary text color */
+    color: var(--text-secondary);
+    /* I set the font weight to medium */
+    font-weight: 400;
+    /* I added a transition for color changes */
+    transition: color 0.3s ease;
+}
+
+/* ===== SEARCH SECTION ===== */
+
+/* I styled the search section container */
+.search-section {
+    /* I used flexbox for layout */
+    display: flex;
+    /* I stacked items vertically */
+    flex-direction: column;
+    /* I centered items horizontally */
+    align-items: center;
+    /* I added a gap between the search bar and geo button */
+    gap: 12px;
+}
+
+/* I styled the search input and button wrapper */
+.search-wrapper {
+    /* I used flexbox for horizontal alignment */
+    display: flex;
+    /* I set the width to fill the parent */
+    width: 100%;
+    /* I added a gap between input and button */
+    gap: 0;
+    /* I made the wrapper a rounded container */
+    border-radius: 14px;
+    /* I added the card shadow for depth */
+    box-shadow: var(--card-shadow);
+    /* I hid overflow for clean rounded corners */
+    overflow: hidden;
+    /* I added a border for definition */
+    border: 1px solid var(--input-border);
+    /* I added a smooth transition for border and shadow changes */
+    transition: all 0.3s ease;
+}
+
+/* I added a focus-within style to highlight the search wrapper when typing */
+.search-wrapper:focus-within {
+    /* I changed the border color to primary when focused */
+    border-color: var(--input-focus-border);
+    /* I enhanced the shadow when focused for visual feedback */
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15), var(--card-shadow);
+}
+
+/* I styled the search text input field */
+.search-input {
+    /* I made the input take all available space */
+    flex: 1;
+    /* I added padding inside the input */
+    padding: 14px 18px;
+    /* I removed the default border */
+    border: none;
+    /* I removed the default outline */
+    outline: none;
+    /* I set the font size for readability */
+    font-size: 0.95rem;
+    /* I applied the input background color */
+    background: var(--input-bg);
+    /* I applied the text color */
+    color: var(--text-color);
+    /* I set the font family to match the app */
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    /* I added a transition for background changes */
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* I styled the placeholder text in the search input */
+.search-input::placeholder {
+    /* I set the placeholder color to secondary text */
+    color: var(--text-secondary);
+    /* I added a transition for color changes */
+    transition: color 0.3s ease;
+}
+
+/* I styled the search button */
+.search-btn {
+    /* I added padding to the button */
+    padding: 14px 20px;
+    /* I removed the default border */
+    border: none;
+    /* I applied the primary color as the background */
+    background: var(--primary-color);
+    /* I set the text color to white for contrast */
+    color: white;
+    /* I set the font size for the icon */
+    font-size: 1.1rem;
+    /* I added a pointer cursor */
+    cursor: pointer;
+    /* I added a transition for hover effects */
+    transition: background 0.3s ease, transform 0.1s ease;
+    /* I set a minimum width for the button */
+    min-width: 56px;
+    /* I used flexbox to center the icon */
+    display: flex;
+    /* I centered the icon horizontally */
+    justify-content: center;
+    /* I centered the icon vertically */
+    align-items: center;
+}
+
+/* I styled the search button hover state */
+.search-btn:hover {
+    /* I darkened the background on hover */
+    background: var(--primary-hover);
+    /* I added a slight scale effect on hover */
+    transform: scale(1.02);
+}
+
+/* I styled the search button active/pressed state */
+.search-btn:active {
+    /* I scaled down slightly on press for tactile feedback */
+    transform: scale(0.98);
+}
+
+/* I styled the geolocation button */
+.geo-btn {
+    /* I added padding to the button */
+    padding: 10px 20px;
+    /* I set the background to a subtle primary tint */
+    background: var(--geo-btn-bg);
+    /* I set a subtle border */
+    border: 1px solid var(--geo-btn-border);
+    /* I applied the primary color as text color */
+    color: var(--primary-color);
+    /* I set the font size */
+    font-size: 0.85rem;
+    /* I set the font weight */
+    font-weight: 500;
+    /* I rounded the button corners */
+    border-radius: 10px;
+    /* I added a pointer cursor */
+    cursor: pointer;
+    /* I added a transition for hover effects */
+    transition: all 0.3s ease;
+    /* I set the font family */
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+/* I styled the geo button hover state */
+.geo-btn:hover {
+    /* I deepened the background on hover */
+    background: rgba(108, 99, 255, 0.15);
+    /* I added a slight upward movement on hover */
+    transform: translateY(-1px);
+}
+
+/* ===== LOADING CONTAINER ===== */
+
+/* I styled the loading container that shows during data fetching */
+.loading-container {
+    /* I hid the loading indicator by default */
+    display: none;
+    /* I set flexbox for centering the spinner and text */
+    /* display: flex; (toggled by JavaScript) */
+    /* I stacked items vertically */
+    flex-direction: column;
+    /* I centered items horizontally */
+    align-items: center;
+    /* I added a gap between spinner and text */
+    gap: 16px;
+    /* I added padding for spacing */
+    padding: 40px 0;
+}
+
+/* I added a visible class to show the loading container */
+.loading-container.visible {
+    /* I used flex display when the visible class is added */
+    display: flex;
+}
+
+/* I styled the loading spinner animation */
+.spinner {
+    /* I set the spinner size */
+    width: 40px;
+    height: 40px;
+    /* I created a circular border for the spinner */
+    border: 3px solid var(--border-color);
+    /* I colored the top border with the primary color for the spinning effect */
+    border-top-color: var(--primary-color);
+    /* I made it circular */
+    border-radius: 50%;
+    /* I applied the spin animation */
+    animation: spin 0.8s linear infinite;
+}
+
+/* I created the spin keyframe animation for the loading spinner */
+@keyframes spin {
+    /* I set the starting rotation */
+    0% { transform: rotate(0deg); }
+    /* I set the full rotation */
+    100% { transform: rotate(360deg); }
+}
+
+/* I styled the loading text */
+.loading-text {
+    /* I set the font size */
+    font-size: 0.9rem;
+    /* I applied the secondary text color */
+    color: var(--text-secondary);
+    /* I set the font weight */
+    font-weight: 400;
+}
+
+/* ===== ERROR CONTAINER ===== */
+
+/* I styled the error message container */
+.error-container {
+    /* I hid the error container by default */
+    display: none;
+    /* I used flexbox for centering */
+    /* display: flex; (toggled by JavaScript) */
+    /* I stacked items vertically */
+    flex-direction: column;
+    /* I centered items horizontally */
+    align-items: center;
+    /* I added a gap between the icon and message */
+    gap: 8px;
+    /* I added padding for spacing */
+    padding: 24px;
+    /* I set a red-tinted background for error indication */
+    background: rgba(255, 107, 107, 0.08);
+    /* I added a red-tinted border */
+    border: 1px solid rgba(255, 107, 107, 0.2);
+    /* I added rounded corners */
+    border-radius: 14px;
+    /* I added a slide-in animation */
+    animation: slideIn 0.3s ease;
+}
+
+/* I added a visible class to show the error container */
+.error-container.visible {
+    /* I used flex display when visible */
+    display: flex;
+}
+
+/* I styled the error icon size */
+.error-icon {
+    /* I set the icon emoji size */
+    font-size: 2rem;
+}
+
+/* I styled the error message text */
+.error-message {
+    /* I set the font size */
+    font-size: 0.95rem;
+    /* I applied the accent/error color */
+    color: var(--accent-color);
+    /* I set the font weight */
+    font-weight: 500;
+    /* I centered the text */
+    text-align: center;
+}
+
+/* I created a slide-in animation for the error container */
+@keyframes slideIn {
+    /* I set the starting position slightly above and transparent */
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    /* I set the ending position at normal location and fully visible */
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== WEATHER CARD ===== */
+
+/* I styled the main weather data display card */
+.weather-card {
+    /* I applied the card background color */
+    background: var(--card-bg);
+    /* I added large rounded corners for modern design */
+    border-radius: 20px;
+    /* I added padding inside the card */
+    padding: 28px;
+    /* I applied the card shadow for depth */
+    box-shadow: var(--card-shadow);
+    /* I added a subtle border */
+    border: 1px solid var(--border-color);
+    /* I added transitions for all properties during theme changes */
+    transition: all 0.3s ease;
+    /* I hid the card by default until data is loaded */
+    display: none;
+    /* I added the slide-in animation when it appears */
+    animation: slideIn 0.4s ease;
+}
+
+/* I added a visible class to show the weather card */
+.weather-card.visible {
+    /* I used block display to show the card */
+    display: block;
+}
+
+/* I added a hover effect to the weather card for interactivity */
+.weather-card:hover {
+    /* I enhanced the shadow on hover */
+    box-shadow: var(--card-shadow-hover);
+    /* I added a slight upward movement on hover */
+    transform: translateY(-2px);
+}
+
+/* ===== WEATHER CARD HEADER ===== */
+
+/* I styled the weather card header section */
+.weather-card-header {
+    /* I centered the text */
+    text-align: center;
+    /* I added a bottom margin for spacing */
+    margin-bottom: 20px;
+    /* I added a bottom border for visual separation */
+    padding-bottom: 16px;
+    /* I applied the border color */
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* I styled the city info container */
+.city-info {
+    /* I used flexbox to align city name and country code */
+    display: flex;
+    /* I centered items horizontally */
+    justify-content: center;
+    /* I aligned items at the baseline for proper text alignment */
+    align-items: baseline;
+    /* I added a gap between city name and country code */
+    gap: 8px;
+    /* I added a bottom margin */
+    margin-bottom: 4px;
+}
+
+/* I styled the city name heading */
+.city-name {
+    /* I set the font size for prominence */
+    font-size: 1.6rem;
+    /* I set the font weight to bold */
+    font-weight: 700;
+    /* I applied the text color */
+    color: var(--text-color);
+    /* I added a transition for color changes */
+    transition: color 0.3s ease;
+}
+
+/* I styled the country code badge */
+.country-code {
+    /* I set the font size smaller than the city name */
+    font-size: 0.75rem;
+    /* I set the font weight */
+    font-weight: 600;
+    /* I applied the primary color as background */
+    background: var(--primary-color);
+    /* I set the text color to white */
+    color: white;
+    /* I added padding for the badge shape */
+    padding: 2px 8px;
+    /* I rounded the badge corners */
+    border-radius: 6px;
+    /* I transformed the text to uppercase */
+    text-transform: uppercase;
+    /* I added letter spacing for readability */
+    letter-spacing: 0.5px;
+}
+
+/* I styled the weather description text */
+.weather-description {
+    /* I set the font size */
+    font-size: 0.95rem;
+    /* I applied the secondary text color */
+    color: var(--text-secondary);
+    /* I capitalized the first letter of each word */
+    text-transform: capitalize;
+    /* I set the font weight */
+    font-weight: 400;
+    /* I added a transition for color changes */
+    transition: color 0.3s ease;
+}
+
+/* ===== WEATHER MAIN (ICON + TEMPERATURE) ===== */
+
+/* I styled the main weather display area with icon and temperature */
+.weather-main {
+    /* I used flexbox for layout */
+    display: flex;
+    /* I centered items horizontally */
+    justify-content: center;
+    /* I centered items vertically */
+    align-items: center;
+    /* I added a gap between icon and temperature */
+    gap: 16px;
+    /* I added vertical margins */
+    margin: 20px 0;
+    /* I added padding */
+    padding: 10px 0;
+}
+
+/* I styled the weather icon wrapper */
+.weather-icon-wrapper {
+    /* I positioned it relative for positioning the fallback emoji */
+    position: relative;
+    /* I used flexbox for centering */
+    display: flex;
+    /* I centered items */
+    justify-content: center;
+    align-items: center;
+}
+
+/* I styled the weather icon image from OpenWeatherMap */
+.weather-icon {
+    /* I set the icon size */
+    width: 100px;
+    height: 100px;
+    /* I added a drop shadow filter for depth */
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+    /* I added a transition for visibility */
+    transition: opacity 0.3s ease;
+}
+
+/* I styled the weather emoji as a fallback/overlay */
+.weather-emoji {
+    /* I positioned it absolutely over the icon */
+    position: absolute;
+    /* I set a large font size */
+    font-size: 4rem;
+    /* I added the float animation for visual interest */
+    animation: float 3s ease-in-out infinite;
+    /* I hid it by default (shown when icon fails) */
+    display: none;
+}
+
+/* I styled the temperature display wrapper */
+.temperature-wrapper {
+    /* I used flexbox for alignment */
+    display: flex;
+    /* I aligned items at the top */
+    align-items: flex-start;
+}
+
+/* I styled the temperature value text */
+.temperature {
+    /* I set a very large font size for the temperature */
+    font-size: 4rem;
+    /* I set the font weight to extra bold */
+    font-weight: 800;
+    /* I applied the text color */
+    color: var(--text-color);
+    /* I set the line height tight for clean display */
+    line-height: 1;
+    /* I added a transition for color changes */
+    transition: color 0.3s ease;
+}
+
+/* I styled the temperature unit symbol (°C or °F) */
+.temp-unit {
+    /* I set the font size smaller than the temperature */
+    font-size: 1.5rem;
+    /* I set the font weight */
+    font-weight: 400;
+    /* I applied the secondary text color */
+    color: var(--text-secondary);
+    /* I added a top margin to align with the temperature */
+    margin-top: 8px;
+    /* I added a transition for color changes */
+    transition: color 0.3s ease;
+}
+
+/* ===== UNIT TOGGLE BUTTON ===== */
+
+/* I styled the Celsius/Fahrenheit toggle button */
+.unit-toggle {
+    /* I made it a block element */
+    display: block;
+    /* I centered it horizontally */
+    margin: 0 auto 20px;
+    /* I added padding */
+    padding: 8px 18px;
+    /* I set a transparent background with primary tint */
+    background: var(--geo-btn-bg);
+    /* I added a subtle border */
+    border: 1px solid var(--geo-btn-border);
+    /* I applied the primary color as text */
+    color: var(--primary-color);
+    /* I set the font size */
+    font-size: 0.8rem;
+    /* I set the font weight */
+    font-weight: 500;
+    /* I rounded the corners */
+    border-radius: 8px;
+    /* I added a pointer cursor */
+    cursor: pointer;
+    /* I added a transition for hover effects */
+    transition: all 0.3s ease;
+    /* I set the font family */
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+/* I styled the unit toggle hover state */
+.unit-toggle:hover {
+    /* I deepened the background on hover */
+    background: rgba(108, 99, 255, 0.15);
+    /* I added a subtle upward movement */
+    transform: translateY(-1px);
+}
+
+/* ===== WEATHER DETAILS GRID ===== */
+
+/* I styled the weather details grid container */
+.weather-details {
+    /* I used CSS Grid for the details layout */
+    display: grid;
+    /* I set two columns with equal width */
+    grid-template-columns: repeat(2, 1fr);
+    /* I added a gap between grid items */
+    gap: 12px;
+}
+
+/* I styled each individual weather detail item */
+.detail-item {
+    /* I applied the detail background */
+    background: var(--detail-bg);
+    /* I added rounded corners */
+    border-radius: 12px;
+    /* I added padding inside each item */
+    padding: 14px;
+    /* I used flexbox for vertical stacking */
+    display: flex;
+    /* I set the flex direction to column */
+    flex-direction: column;
+    /* I centered items horizontally */
+    align-items: center;
+    /* I added a gap between the icon, label, and value */
+    gap: 6px;
+    /* I added a subtle border */
+    border: 1px solid var(--detail-border);
+    /* I added a smooth transition for background and border changes */
+    transition: all 0.3s ease;
+}
+
+/* I added a hover effect to detail items for interactivity */
+.detail-item:hover {
+    /* I added a slight scale effect on hover */
+    transform: scale(1.02);
+    /* I added a subtle shadow on hover */
+    box-shadow: 0 4px 12px rgba(108, 99, 255, 0.08);
+}
+
+/* I styled the detail icon (emoji) */
+.detail-icon {
+    /* I set the icon size */
+    font-size: 1.4rem;
+}
+
+/* I styled the detail label text */
+.detail-label {
+    /* I set the font size for the label */
+    font-size: 0.72rem;
+    /* I applied the secondary text color */
+    color: var(--text-secondary);
+    /* I set the font weight */
+    font-weight: 400;
+    /* I transformed text to uppercase for consistency */
+    text-transform: uppercase;
+    /* I added letter spacing for readability */
+    letter-spacing: 0.8px;
+    /* I added a transition for color changes */
+    transition: color 0.3s ease;
+}
+
+/* I styled the detail value text */
+.detail-value {
+    /* I set the font size for the value */
+    font-size: 1rem;
+    /* I set the font weight to semi-bold */
+    font-weight: 600;
+    /* I applied the text color */
+    color: var(--text-color);
+    /* I added a transition for color changes */
+    transition: color 0.3s ease;
+}
+
+/* ===== FOOTER ===== */
+
+/* I styled the app footer */
+.app-footer {
+    /* I centered the text */
+    text-align: center;
+    /* I added padding for spacing */
+    padding: 16px 0 0;
+    /* I added a top margin to push it down */
+    margin-top: auto;
+}
+
+/* I styled the main footer text */
+.app-footer p {
+    /* I set the font size */
+    font-size: 0.85rem;
+    /* I applied the footer text color */
+    color: var(--footer-color);
+    /* I added a transition for color changes */
+    transition: color 0.3s ease;
+}
+
+/* I styled the strong element inside the footer */
+.app-footer strong {
+    /* I applied the primary color to the company name */
+    color: var(--primary-color);
+}
+
+/* I styled the footer subtitle text */
+.footer-sub {
+    /* I set a smaller font size */
+    font-size: 0.75rem !important;
+    /* I added a top margin */
+    margin-top: 4px;
+    /* I reduced the opacity slightly */
+    opacity: 0.7;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* I created a media query for tablet screens (768px - 1024px) */
+@media (max-width: 1024px) {
+    /* I adjusted the container padding for tablets */
+    .container {
+        padding: 16px 20px 32px;
+    }
+
+    /* I adjusted the weather card padding */
+    .weather-card {
+        padding: 24px;
+    }
+
+    /* I adjusted the temperature font size */
+    .temperature {
+        font-size: 3.5rem;
+    }
+}
+
+/* I created a media query for mobile screens (480px - 768px) */
+@media (max-width: 768px) {
+    /* I adjusted the container padding for mobile */
+    .container {
+        padding: 12px 15px 28px;
+        /* I reduced the gap between elements */
+        gap: 16px;
+    }
+
+    /* I adjusted the header padding */
+    .app-header {
+        padding: 12px 16px;
+        /* I reduced the border radius slightly */
+        border-radius: 12px;
+    }
+
+    /* I adjusted the app title font size */
+    .logo h1 {
+        font-size: 1.1rem;
+    }
+
+    /* I adjusted the logo icon size */
+    .logo-icon {
+        font-size: 1.5rem;
+    }
+
+    /* I adjusted the greeting font size */
+    .greeting {
+        font-size: 1.2rem;
+    }
+
+    /* I adjusted the datetime font size */
+    .datetime {
+        font-size: 0.8rem;
+    }
+
+    /* I adjusted the search input padding */
+    .search-input {
+        padding: 12px 14px;
+        font-size: 0.9rem;
+    }
+
+    /* I adjusted the search button padding */
+    .search-btn {
+        padding: 12px 16px;
+        min-width: 48px;
+    }
+
+    /* I adjusted the weather card padding */
+    .weather-card {
+        padding: 20px;
+        border-radius: 16px;
+    }
+
+    /* I adjusted the city name font size */
+    .city-name {
+        font-size: 1.3rem;
+    }
+
+    /* I adjusted the temperature font size */
+    .temperature {
+        font-size: 3rem;
+    }
+
+    /* I adjusted the weather icon size */
+    .weather-icon {
+        width: 80px;
+        height: 80px;
+    }
+
+    /* I adjusted the weather emoji size */
+    .weather-emoji {
+        font-size: 3rem;
+    }
+
+    /* I adjusted the weather details grid for mobile */
+    .weather-details {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    /* I adjusted the detail item padding */
+    .detail-item {
+        padding: 12px;
+    }
+}
+
+/* I created a media query for small mobile screens (320px - 480px) */
+@media (max-width: 480px) {
+    /* I adjusted the container padding for small screens */
+    .container {
+        padding: 8px 10px 20px;
+        gap: 12px;
+    }
+
+    /* I adjusted the header padding */
+    .app-header {
+        padding: 10px 12px;
+        border-radius: 10px;
+        /* I made the header non-sticky on small screens to save space */
+        position: relative;
+        top: 0;
+    }
+
+    /* I reduced the app title font size further */
+    .logo h1 {
+        font-size: 0.95rem;
+    }
+
+    /* I reduced the logo icon size further */
+    .logo-icon {
+        font-size: 1.3rem;
+    }
+
+    /* I reduced the toggle size for small screens */
+    .theme-toggle {
+        width: 42px;
+        height: 22px;
+    }
+
+    /* I adjusted the slider knob for the smaller toggle */
+    .slider:before {
+        height: 16px;
+        width: 16px;
+        left: 3px;
+        bottom: 3px;
+    }
+
+    /* I adjusted the knob position when checked */
+    .theme-toggle input:checked + .slider:before {
+        transform: translateX(20px);
+    }
+
+    /* I reduced the theme icon size */
+    .theme-icon {
+        font-size: 0.9rem;
+    }
+
+    /* I reduced the greeting font size */
+    .greeting {
+        font-size: 1.05rem;
+    }
+
+    /* I adjusted the search wrapper border radius */
+    .search-wrapper {
+        border-radius: 10px;
+    }
+
+    /* I adjusted the search input */
+    .search-input {
+        padding: 11px 12px;
+        font-size: 0.85rem;
+    }
+
+    /* I adjusted the search button */
+    .search-btn {
+        padding: 11px 14px;
+        min-width: 44px;
+        font-size: 1rem;
+    }
+
+    /* I adjusted the geo button */
+    .geo-btn {
+        font-size: 0.78rem;
+        padding: 8px 16px;
+    }
+
+    /* I adjusted the weather card padding */
+    .weather-card {
+        padding: 16px;
+        border-radius: 14px;
+    }
+
+    /* I reduced the city name font size */
+    .city-name {
+        font-size: 1.15rem;
+    }
+
+    /* I reduced the temperature font size */
+    .temperature {
+        font-size: 2.5rem;
+    }
+
+    /* I adjusted the temperature unit */
+    .temp-unit {
+        font-size: 1.1rem;
+        margin-top: 5px;
+    }
+
+    /* I reduced the weather icon size */
+    .weather-icon {
+        width: 70px;
+        height: 70px;
+    }
+
+    /* I reduced the weather emoji size */
+    .weather-emoji {
+        font-size: 2.5rem;
+    }
+
+    /* I switched to a 2-column grid with smaller gap on small screens */
+    .weather-details {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    /* I adjusted the detail item padding */
+    .detail-item {
+        padding: 10px 8px;
+        border-radius: 10px;
+    }
+
+    /* I reduced the detail icon size */
+    .detail-icon {
+        font-size: 1.2rem;
+    }
+
+    /* I reduced the detail label font size */
+    .detail-label {
+        font-size: 0.65rem;
+    }
+
+    /* I reduced the detail value font size */
+    .detail-value {
+        font-size: 0.88rem;
+    }
+
+    /* I adjusted the footer font sizes */
+    .app-footer p {
+        font-size: 0.75rem;
+    }
+
+    /* I adjusted the footer subtitle */
+    .footer-sub {
+        font-size: 0.65rem !important;
+    }
+}
+
+/* ===== ADDITIONAL ANIMATIONS ===== */
+
+/* I created a pulse animation for the loading state */
+@keyframes pulse {
+    /* I set the starting opacity */
+    0% { opacity: 1; }
+    /* I set the middle opacity to create a pulsing effect */
+    50% { opacity: 0.5; }
+    /* I set the ending opacity back to full */
+    100% { opacity: 1; }
+}
+
+/* I created a fadeIn animation for smooth element appearance */
+@keyframes fadeIn {
+    /* I set the starting state as invisible */
+    from { opacity: 0; }
+    /* I set the ending state as fully visible */
+    to { opacity: 1; }
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+
+/* I styled the scrollbar for webkit browsers to match the theme */
+::-webkit-scrollbar {
+    /* I set the scrollbar width */
+    width: 6px;
+}
+
+/* I styled the scrollbar track */
+::-webkit-scrollbar-track {
+    /* I set the track background */
+    background: var(--bg-color);
+}
+
+/* I styled the scrollbar thumb (the draggable part) */
+::-webkit-scrollbar-thumb {
+    /* I set the thumb color to a semi-transparent primary color */
+    background: rgba(108, 99, 255, 0.3);
+    /* I rounded the thumb corners */
+    border-radius: 3px;
+}
+
+/* I styled the scrollbar thumb hover state */
+::-webkit-scrollbar-thumb:hover {
+    /* I darkened the thumb on hover */
+    background: rgba(108, 99, 255, 0.5);
+}
+
+/* ===== ACCESSIBILITY ===== */
+
+/* I added a focus-visible style for keyboard navigation accessibility */
+*:focus-visible {
+    /* I added a visible outline for keyboard-focused elements */
+    outline: 2px solid var(--primary-color);
+    /* I offset the outline slightly from the element */
+    outline-offset: 2px;
+}
+
+/* I added a reduced motion preference for users who prefer less animation */
+@media (prefers-reduced-motion: reduce) {
+    /* I disabled all animations and transitions for accessibility */
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
