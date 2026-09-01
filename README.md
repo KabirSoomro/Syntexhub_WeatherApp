@@ -30,9 +30,7 @@
 
 ## 🚀 Live Demo
 
-> 🔗 **[Click here to view the Live Demo](https://your-github-username.github.io/Syntexhub_WeatherApp/)**
-
-*(Replace the link above with your actual GitHub Pages URL after deployment)*
+> 🔗 **[Click here to view the Live Demo](https://kabirsoomro.github.io/Syntexhub_WeatherApp/)**
 
 ---
 
@@ -40,7 +38,7 @@
 
 ### 🌍 Core Features
 - **Real-Time Weather Data** — Fetches live weather data from OpenWeatherMap API
-- **City Search** — Search any city worldwide with instant results
+- **City Search with Live Autocomplete** — Type a city name to see instant dropdown suggestions (powered by Geocoding API)
 - **Enter Key Support** — Press Enter to search, no need to click the button
 - **Weather Details** — Temperature, Humidity, Wind Speed, Pressure, Visibility, Sunrise time
 - **Weather Icons** — Dynamic weather icons from OpenWeatherMap with emoji fallback
@@ -54,6 +52,7 @@
 
 ### 📍 Geolocation Support
 - **"Use My Location" Button** — Automatically detects user's city using browser Geolocation API
+- **Smart Input Update** — Automatically populates the search bar with your detected location
 - **Permission Handling** — Graceful error messages if location access is denied
 - **High Accuracy** — Uses `enableHighAccuracy: true` for precise location
 
@@ -72,6 +71,7 @@
 - **Loading Spinner** — Animated spinner while fetching data
 - **Error Handling** — Friendly error messages for invalid cities, network issues, API errors
 - **Weather Emojis** — Contextual emojis (⛈️ 🌧️ ☀️ ❄️ ☁️) based on weather condition
+- **Debounce Optimization** — Smart API calling that waits for you to finish typing to save API requests
 
 ### 📱 Fully Responsive
 - **4 Breakpoints** — Desktop (1024px+), Tablet (768-1024px), Mobile (480-768px), Small Mobile (320-480px)
@@ -115,7 +115,7 @@ Weather_App/
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/Syntexhub_WeatherApp.git
+git clone https://github.com/KabirSoomro/Syntexhub_WeatherApp.git
 cd Syntexhub_WeatherApp
 ```
 
