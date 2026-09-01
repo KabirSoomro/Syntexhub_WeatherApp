@@ -650,15 +650,18 @@ body {
     padding: 8px 0;
     max-height: 250px;
     overflow-y: auto;
-    display: none;
+    visibility: hidden;
+    pointer-events: none;
     opacity: 0;
     transform: translateY(-10px);
     transition: all 0.3s ease;
+    z-index: 100;
 }
 
 /* I created a class to show the suggestions smoothly */
 .suggestions-list.visible {
-    display: block;
+    visibility: visible;
+    pointer-events: auto;
     opacity: 1;
     transform: translateY(0);
 }
